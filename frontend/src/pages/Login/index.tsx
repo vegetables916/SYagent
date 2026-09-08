@@ -1,49 +1,109 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import './index.css'
+import { Form, Input, Button, message } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { motion } from 'motion/react'
+import './index.scss'
+
+interface LoginFormValues {
+  username: string
+  password: string
+}
 
 function LoginPage() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('登录:', { username, password })
-    navigate('/')
+  const handleLogin = async (values: LoginFormValues) => {
+    setLoading(true)
+    console.log('登录:', values)
+    
+    setTimeout(() => {
+      setLoading(false)
+      message.success('登录成功')
+      navigate('/')
+    }, 1000)
   }
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2 className="login-title">AI Agent Workflow Platform</h2>
-        <form onSubmit={handleLogin} className="login-form">
-          <div className="form-item">
-            <label className="form-label">用户名</label>
-            <input
-              type="text"
-              className="form-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="请输入用户名"
-            />
-          </div>
-          <div className="form-item">
-            <label className="form-label">密码</label>
-            <input
-              type="password"
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="请输入密码"
-            />
-          </div>
-          <button type="submit" className="login-btn">
-            登录
-          </button>
-        </form>
-      </div>
-    </div>
+    <motion.div
+      className="login-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="login-box"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <motion.h2
+          className="login-title"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          AI Agent Workflow Platform
+        </motion.h2>
+
+        <Form
+          name="login"
+          onFinish={handleLogin}
+          size="large"
+          autoComplete="off"
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Form.Item
+              name="username"
+              rules={[{ required: true, message: '请输入用户名' }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="用户名"
+              />
+            </Form.Item>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+          >
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: '请输入密码' }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="密码"
+              />
+            </Form.Item>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.6 }}
+          >
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                block
+              >
+                登录
+              </Button>
+            </Form.Item>
+          </motion.div>
+        </Form>
+      </motion.div>
+    </motion.div>
   )
 }
 
