@@ -1,0 +1,14 @@
+{
+  "name": "ai-agent-workflow-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "test": "echo 跳过测试"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "@commitlint/cli": "^18.6.0",
+    "@commitlint/config-conventional": "^18.6.0"
+  }
+}
