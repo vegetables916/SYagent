@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import logo from '@/assets/logo.png'
+import { useUserStore } from '@/stores/userStore'
 import '../css/MainLayout.scss'
 
 const { Sider, Content } = Layout
@@ -40,13 +41,14 @@ const menuItems: MenuProps['items'] = [
 function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { userInfo, logout } = useUserStore()
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     navigate(key)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    logout()
     message.success('已退出登录')
     navigate('/login')
   }
@@ -74,7 +76,7 @@ function MainLayout() {
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <div className="user-info">
             <Avatar size="small" icon={<UserOutlined />} />
-            <span className="user-name">用户</span>
+            <span className="user-name">{userInfo?.username || '用户'}</span>
           </div>
         </Dropdown>
       </div>

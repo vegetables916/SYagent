@@ -33,8 +33,9 @@ class RequestClient {
           }
         }
 
-        // 添加 token（从 localStorage 获取）
-        const token = localStorage.getItem('token');
+        // 添加 token（从 zustand store 获取）
+        const { useUserStore } = await import('@/stores/userStore');
+        const token = useUserStore.getState().token;
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }

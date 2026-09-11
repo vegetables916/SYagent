@@ -4,6 +4,7 @@ import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { motion } from 'motion/react';
 import { authApi } from '@/api/modules/auth';
+import { useUserStore } from '@/stores/userStore';
 import './index.scss';
 
 interface LoginFormValues {
@@ -24,14 +25,18 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<FormMode>('login');
+  const { setToken, setUserInfo } = useUserStore();
 
   const handleLogin = async (values: LoginFormValues) => {
     setLoading(true);
 
     try {
       const result = await authApi.login(values);
-      // 存储 token
-      localStorage.setItem('token', result.access_token);
+      // 存储 token 到 zustand
+      setToken(result.access_token);
+      // 获取用户信息
+      const userInfo = await authApi.getMe();
+      setUserInfo(userInfo);
       message.success('登录成功');
       navigate('/');
     } catch (error) {
