@@ -1,22 +1,16 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.core.middleware import register_middlewares
 from app.api.router import api_router
 
 app = FastAPI(
-    title="AI Agent Workflow Platform",
-    description="基于工作流画布的 AI Agent 开发平台",
-    version="0.1.0"
+    title=settings.APP_TITLE,
+    description=settings.APP_DESCRIPTION,
+    version=settings.APP_VERSION
 )
 
-# CORS 配置
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 注册中间件
+register_middlewares(app)
 
 @app.get("/")
 async def root():

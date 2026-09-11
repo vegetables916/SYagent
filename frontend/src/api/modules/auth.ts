@@ -9,31 +9,30 @@ export interface LoginParams {
 // 注册请求参数
 export interface RegisterParams {
   username: string;
+  email: string;
   password: string;
-  confirmPassword: string;
 }
 
-// 登录响应数据
+// 登录响应数据（匹配后端 TokenResponse）
 export interface LoginResult {
-  token: string;
-  userId: string;
-  username: string;
+  access_token: string;
+  token_type: string;
 }
 
 // 认证相关接口
 export const authApi = {
   // 登录
   async login(data: LoginParams): Promise<LoginResult> {
-    return await requestClient.post('/auth/login', data);
+    return await requestClient.post('/v1/auth/login', data);
   },
 
   // 注册
-  async register(data: RegisterParams): Promise<void> {
-    return await requestClient.post('/auth/register', data);
+  async register(data: RegisterParams): Promise<{ message: string }> {
+    return await requestClient.post('/v1/auth/register', data);
   },
 
-  // 退出登录
-  async logout(): Promise<void> {
-    return await requestClient.post('/auth/logout');
+  // 获取当前用户信息
+  async getMe(): Promise<{ id: number; username: string; email: string }> {
+    return await requestClient.get('/v1/auth/me');
   },
 };

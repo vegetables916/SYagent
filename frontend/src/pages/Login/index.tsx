@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { motion } from 'motion/react';
+import { authApi } from '@/api/modules/auth';
 import './index.scss';
 
 interface LoginFormValues {
@@ -12,6 +13,7 @@ interface LoginFormValues {
 
 interface RegisterFormValues {
   username: string;
+  email: string;
   password: string;
   confirmPassword: string;
 }
@@ -27,12 +29,14 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // TODO: 调用登录 API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await authApi.login(values);
+      // 存储 token
+      localStorage.setItem('token', result.access_token);
       message.success('登录成功');
       navigate('/');
-    } catch {
-      message.error('登录失败，请检查用户名和密码');
+    } catch (error) {
+      // 错误已在拦截器中处理
+      console.error('登录失败:', error);
     } finally {
       setLoading(false);
     }
@@ -42,12 +46,15 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // TODO: 调用注册 API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await authApi.register({
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      });
       message.success('注册成功，请登录');
       setMode('login');
-    } catch {
-      message.error('注册失败，请稍后重试');
+    } catch (error) {
+      console.error('注册失败:', error);
     } finally {
       setLoading(false);
     }
@@ -120,6 +127,16 @@ function LoginPage() {
               rules={[{ required: true, message: '请输入用户名' }]}
             >
               <Input prefix={<UserOutlined />} placeholder="用户名" />
+            </Form.Item>
+
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: '请输入邮箱' },
+                { type: 'email', message: '请输入有效的邮箱地址' },
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="邮箱" />
             </Form.Item>
 
             <Form.Item

@@ -5,8 +5,9 @@ class Settings(BaseSettings):
     """应用配置"""
     
     # 项目信息
-    PROJECT_NAME: str = "AI Agent Workflow Platform"
-    VERSION: str = "0.1.0"
+    APP_TITLE: str = "AI Agent Workflow Platform"
+    APP_DESCRIPTION: str = "基于工作流画布的 AI Agent 开发平台"
+    APP_VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
     
     # CORS
