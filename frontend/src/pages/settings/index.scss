@@ -1,0 +1,44 @@
+.settings-page {
+  max-width: 960px;
+}
+
+.settings-page-header {
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .settings-desc {
+    margin: 0;
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+.settings-card {
+  border-radius: 8px;
+
+  .ant-tabs-nav {
+    margin-bottom: 20px;
+  }
+}
+
+.settings-tab-content {
+  .tab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+  }
+}
