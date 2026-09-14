@@ -16,7 +16,6 @@ class TestLLMIntegration:
         assert len(result) > 0
     
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="需要真实的 API Key，手动运行")
     async def test_deepseek_real_chat(self):
         """测试 DeepSeek 真实对话"""
         client = get_llm_client("deepseek")
