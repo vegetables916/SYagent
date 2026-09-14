@@ -25,8 +25,10 @@ async def chat_loop(provider: str):
             break
 
         try:
-            response = await client.chat(user_input)
-            print(f"AI: {response}\n")
+            print("AI: ", end="", flush=True)
+            async for token in client.chat_stream(user_input):
+                print(token, end="", flush=True)
+            print("\n")
         except Exception as e:
             print(f"错误: {e}\n")
 

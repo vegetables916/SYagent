@@ -53,3 +53,39 @@ class BaseLLMClient(ABC):
 
         response = await self.client.ainvoke(messages)
         return response.content
+
+    async def chat_stream(self, message: str, system_prompt: str | None = None):
+        """
+        流式发送聊天消息
+
+        Args:
+            message: 用户消息
+            system_prompt: 系统提示词（可选）
+
+        Yields:
+            模型回复的每个 token
+        """
+        messages = []
+        if system_prompt:
+            messages.append(SystemMessage(content=system_prompt))
+        messages.append(HumanMessage(content=message))
+
+        async for chunk in self.client.astream(messages):
+            if chunk.content:
+                yield chunk.content
+
+    async def chat_batch(self, messages_list: list[str], system_prompt: str | None = None) -> list[str]:
+        """
+        批量发送聊天消息
+
+        Args:
+            messages_list: 用户消息列表
+            system_prompt: 系统提示词（可选）
+
+        Returns:
+            模型回复内容列表
+
+        Raises:
+            NotImplementedError: 待实现
+        """
+        raise NotImplementedError("批量处理功能待实现")
