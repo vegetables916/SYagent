@@ -5,8 +5,12 @@ LLM 基础客户端 - 抽象基类
 """
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+if TYPE_CHECKING:
+    from app.llm.context.base import BaseContextManager
 
 
 class BaseLLMClient(ABC):
@@ -35,23 +39,47 @@ class BaseLLMClient(ABC):
             self._client = self._create_client()
         return self._client
 
-    async def chat(self, message: str, system_prompt: str | None = None) -> str:
+    async def chat(
+        self,
+        message: str,
+        system_prompt: str | None = None,
+        context: "BaseContextManager | None" = None,
+    ) -> str:
         """
         发送聊天消息
 
         Args:
             message: 用户消息
             system_prompt: 系统提示词（可选）
+            context: 上下文管理器（可选，用于多轮对话）
 
         Returns:
             模型回复内容
         """
-        messages = []
-        if system_prompt:
-            messages.append(SystemMessage(content=system_prompt))
-        messages.append(HumanMessage(content=message))
+        # 如果有上下文，添加到 context
+        if context:
+            context.add_message("user", message)
+            messages = []
+            if system_prompt:
+                messages.append(SystemMessage(content=system_prompt))
+            # 从 context 获取历史消息
+            for msg in context.get_messages():
+                if msg["role"] == "user":
+                    messages.append(HumanMessage(content=msg["content"]))
+                elif msg["role"] == "assistant":
+                    messages.append(AIMessage(content=msg["content"]))
+        else:
+            messages = []
+            if system_prompt:
+                messages.append(SystemMessage(content=system_prompt))
+            messages.append(HumanMessage(content=message))
 
         response = await self.client.ainvoke(messages)
+        
+        # 如果有上下文，保存 AI 回复
+        if context:
+            context.add_message("assistant", response.content)
+        
         return response.content
 
     async def chat_stream(self, message: str, system_prompt: str | None = None):
