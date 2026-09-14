@@ -17,10 +17,10 @@ cryptography==42.0.0
 redis==5.0.1
 
 # LangGraph & LangChain (AI Agent 功能)
-langgraph==0.2.0
-langchain==0.3.0
-langchain-openai==0.2.0
-langchain-core==0.3.0
+langgraph>=0.2.20,<0.3
+langchain>=0.3,<0.4
+langchain-openai>=0.2,<0.3
+langchain-core>=0.3,<0.4
 
 # 认证
 python-jose[cryptography]==3.3.0

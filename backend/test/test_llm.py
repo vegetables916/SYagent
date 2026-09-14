@@ -52,30 +52,33 @@ class TestLLMChat:
         """测试不带系统提示词的聊天"""
         client = get_llm_client("openai")
         
-        # Mock 实际的 API 调用
-        with patch.object(client, 'client') as mock_client:
-            mock_response = AsyncMock()
-            mock_response.content = "测试回复"
-            mock_client.ainvoke = AsyncMock(return_value=mock_response)
-            
-            result = await client.chat("你好")
-            
-            assert result == "测试回复"
-            mock_client.ainvoke.assert_called_once()
+        # Mock 实际的 API 调用 - 直接设置 _client 属性
+        mock_client = AsyncMock()
+        mock_response = AsyncMock()
+        mock_response.content = "测试回复"
+        mock_client.ainvoke = AsyncMock(return_value=mock_response)
+        client._client = mock_client
+        
+        result = await client.chat("你好")
+        
+        assert result == "测试回复"
+        mock_client.ainvoke.assert_called_once()
     
     @pytest.mark.asyncio
     async def test_chat_with_system_prompt(self):
         """测试带系统提示词的聊天"""
         client = get_llm_client("openai")
         
-        with patch.object(client, 'client') as mock_client:
-            mock_response = AsyncMock()
-            mock_response.content = "我是助手"
-            mock_client.ainvoke = AsyncMock(return_value=mock_response)
-            
-            result = await client.chat("你是谁", system_prompt="你是一个助手")
-            
-            assert result == "我是助手"
-            # 验证调用时传入了系统提示词
-            call_args = mock_client.ainvoke.call_args[0][0]
-            assert len(call_args) == 2  # SystemMessage + HumanMessage
+        # Mock 实际的 API 调用 - 直接设置 _client 属性
+        mock_client = AsyncMock()
+        mock_response = AsyncMock()
+        mock_response.content = "我是助手"
+        mock_client.ainvoke = AsyncMock(return_value=mock_response)
+        client._client = mock_client
+        
+        result = await client.chat("你是谁", system_prompt="你是一个助手")
+        
+        assert result == "我是助手"
+        # 验证调用时传入了系统提示词
+        call_args = mock_client.ainvoke.call_args[0][0]
+        assert len(call_args) == 2  # SystemMessage + HumanMessage

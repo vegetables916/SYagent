@@ -34,7 +34,7 @@ def get_llm_client(provider: str | None = None) -> BaseLLMClient:
     Returns:
         对应的 LLM 客户端实例
     """
-    provider = provider or settings.DEFAULT_LLM_PROVIDER
+    provider = provider or llm_settings.DEFAULT_LLM_PROVIDER
 
     if provider not in _client_cache:
         if provider not in _PROVIDER_REGISTRY:

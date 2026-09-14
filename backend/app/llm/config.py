@@ -2,9 +2,14 @@
 LLM 模块配置
 
 独立的配置管理，只关注大模型相关设置
+读取本目录下的 .env 文件，与主项目配置完全隔离
 """
 
+from pathlib import Path
 from pydantic_settings import BaseSettings
+
+# LLM 模块根目录
+_LLM_DIR = Path(__file__).resolve().parent
 
 
 class LLMSettings(BaseSettings):
@@ -24,9 +29,10 @@ class LLMSettings(BaseSettings):
     DEFAULT_LLM_PROVIDER: str = "openai"
 
     class Config:
-        env_file = ".env"
+        env_file = str(_LLM_DIR / ".env")
         env_file_encoding = "utf-8"
         case_sensitive = True
+        extra = "forbid"
 
 
 # 全局单例
