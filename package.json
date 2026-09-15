@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "test": "echo 跳过测试"
+    "test": "cd backend && python -m pytest test/ci -v"
   },
   "devDependencies": {
     "husky": "^9.0.11",
