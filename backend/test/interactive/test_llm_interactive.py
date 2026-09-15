@@ -1,7 +1,7 @@
 """
 LLM 交互式测试
 
-用法: python test/test_llm_interactive.py [--provider deepseek] [--context simple] [--max-messages 20]
+用法: python -m test.interactive.test_llm_interactive [--provider deepseek] [--context simple] [--max-messages 20]
 """
 import asyncio
 import argparse
