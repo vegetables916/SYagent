@@ -5,12 +5,14 @@ from app.llm.context.base import BaseContextManager
 from app.llm.context.simple import SimpleContextManager
 from app.llm.context.summary import SummaryContextManager
 from app.llm.context.embedding import EmbeddingContextManager
+from app.llm.context.hybrid import HybridContextManager
 
 # 策略注册表
 _STRATEGY_REGISTRY: dict[str, Callable[..., BaseContextManager]] = {
     "simple": SimpleContextManager,
     "summary": SummaryContextManager,
     "embedding": EmbeddingContextManager,
+    "hybrid": HybridContextManager,
 }
 
 
