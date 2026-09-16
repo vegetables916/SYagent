@@ -18,7 +18,7 @@ from app.llm.context import (
     BaseContextManager,
     SimpleContextManager,
     SummaryContextManager,
-    EmbeddingContextManager,
+    HybridContextManager,
     get_context_manager,
     register_context_strategy,
 )
@@ -40,7 +40,7 @@ __all__ = [
     "BaseContextManager",
     "SimpleContextManager",
     "SummaryContextManager",
-    "EmbeddingContextManager",
+    "HybridContextManager",
     "get_context_manager",
     "register_context_strategy",
     # Embedding 服务
