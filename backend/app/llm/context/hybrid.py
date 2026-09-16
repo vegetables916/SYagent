@@ -1,11 +1,12 @@
 """混合上下文管理器 - 滑动窗口 + 向量检索"""
 
 import numpy as np
-from typing import List, Literal
+from typing import List
 from app.llm.context.base import BaseContextManager, MessageRole
 from app.llm.context.vector_store import VectorStore, MessageWithVector
 from app.llm.context.qdrant_vector_store import QdrantVectorStore
 from app.llm.embeddings import get_embedding_service
+from app.llm.config import llm_settings
 
 
 class HybridContextManager(BaseContextManager):
@@ -20,41 +21,24 @@ class HybridContextManager(BaseContextManager):
     注意：此类必须使用异步方法，同步方法会抛出异常
     """
 
-    def __init__(
-        self,
-        recent_count: int = 10,
-        relevant_count: int = 5,
-        embedding_provider: str = "openai",
-        vector_store_backend: Literal["memory", "qdrant"] = "memory",
-        qdrant_host: str = "localhost",
-        qdrant_port: int = 6333,
-        qdrant_collection: str = "conversation_messages",
-    ):
-        """初始化
-
-        Args:
-            recent_count: 滑动窗口保留的最近消息数量
-            relevant_count: 向量检索返回的相关消息数量
-            embedding_provider: Embedding 服务提供商
-            vector_store_backend: 向量存储后端 ("memory" 或 "qdrant")
-            qdrant_host: Qdrant 服务地址（仅 qdrant 后端）
-            qdrant_port: Qdrant 端口（仅 qdrant 后端）
-            qdrant_collection: Qdrant 集合名称（仅 qdrant 后端）
-        """
-        self._recent_count = recent_count
-        self._relevant_count = relevant_count
+    def __init__(self):
+        """初始化（配置从 llm_settings 读取）"""
+        self._recent_count = llm_settings.CONTEXT_RECENT_COUNT
+        self._relevant_count = llm_settings.CONTEXT_RELEVANT_COUNT
+        
+        # 先初始化 Embedding 服务（获取维度）
+        self._embedding_service = get_embedding_service(llm_settings.CONTEXT_EMBEDDING_PROVIDER)
         
         # 选择向量存储后端
-        if vector_store_backend == "qdrant":
+        if llm_settings.CONTEXT_VECTOR_STORE_BACKEND == "qdrant":
             self._vector_store = QdrantVectorStore(
-                host=qdrant_host,
-                port=qdrant_port,
-                collection_name=qdrant_collection,
+                host=llm_settings.QDRANT_HOST,
+                port=llm_settings.QDRANT_PORT,
+                collection_name=llm_settings.QDRANT_COLLECTION,
+                vector_size=self._embedding_service.dimension,  # 动态获取维度
             )
         else:
             self._vector_store = VectorStore()
-        
-        self._embedding_service = get_embedding_service(embedding_provider)
 
     def add_message(self, role: MessageRole, content: str) -> None:
         """同步添加消息 - 不支持，请使用 add_message_async"""

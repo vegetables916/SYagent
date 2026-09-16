@@ -3,11 +3,13 @@
 from typing import Callable, Dict
 from app.llm.embeddings.base import BaseEmbeddingService
 from app.llm.embeddings.openai_embedding import OpenAIEmbeddingService
+from app.llm.embeddings.local_embedding import LocalEmbeddingService
 
 
 # 服务注册表
 _REGISTRY: Dict[str, Callable[..., BaseEmbeddingService]] = {
     "openai": OpenAIEmbeddingService,
+    "local": LocalEmbeddingService,
 }
 
 

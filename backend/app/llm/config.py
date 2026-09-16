@@ -28,6 +28,19 @@ class LLMSettings(BaseSettings):
     # 默认提供商
     DEFAULT_LLM_PROVIDER: str = "openai"
 
+    # 上下文管理配置
+    CONTEXT_STRATEGY: str = "hybrid"  # simple / summary / hybrid
+    CONTEXT_RECENT_COUNT: int = 10  # 滑动窗口保留的最近消息数量
+    CONTEXT_RELEVANT_COUNT: int = 5  # 向量检索返回的相关消息数量
+    CONTEXT_EMBEDDING_PROVIDER: str = "local"  # openai / local
+    CONTEXT_VECTOR_STORE_BACKEND: str = "qdrant"  # memory / qdrant
+    LOCAL_EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"  # 本地 embedding 模型
+
+    # Qdrant 配置
+    QDRANT_HOST: str = "localhost"
+    QDRANT_PORT: int = 6333
+    QDRANT_COLLECTION: str = "conversation_messages"
+
     class Config:
         env_file = str(_LLM_DIR / ".env")
         env_file_encoding = "utf-8"

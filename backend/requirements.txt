@@ -25,6 +25,7 @@ langchain-core>=0.3,<0.4
 # 向量存储（词嵌入方案）
 faiss-cpu>=1.7.4,<2.0
 qdrant-client>=1.19.0,<2.0
+sentence-transformers>=2.2.0,<3.0
 
 # 认证
 python-jose[cryptography]==3.3.0
