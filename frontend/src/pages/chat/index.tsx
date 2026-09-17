@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { Input, Avatar, Spin } from 'antd'
-import { SendOutlined, UserOutlined, RobotOutlined } from '@ant-design/icons'
+import { Input, Avatar, Spin, Tooltip } from 'antd'
+import { SendOutlined, UserOutlined, RobotOutlined, PaperClipOutlined } from '@ant-design/icons'
 import './index.scss'
 
 interface Message {
@@ -8,7 +8,30 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
+  attachments?: FileAttachment[]
 }
+
+interface FileAttachment {
+  id: string
+  name: string
+  size: number
+  type: string
+  file: File
+}
+
+// 允许的文件类型：图片 + 文档（pdf/markdown/word/excel）
+const ACCEPTED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'text/markdown',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel',
+].join(',')
 
 function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -21,7 +44,9 @@ function ChatPage() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
+  const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -29,17 +54,19 @@ function ChatPage() {
 
   const handleSend = async () => {
     const text = inputValue.trim()
-    if (!text || loading) return
+    if ((!text && attachments.length === 0) || loading) return
 
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: text,
       timestamp: Date.now(),
+      attachments: attachments.length > 0 ? [...attachments] : undefined,
     }
 
     setMessages((prev) => [...prev, userMsg])
     setInputValue('')
+    setAttachments([])
     setLoading(true)
 
     // TODO: 调用后端 AI 对话接口
@@ -62,6 +89,30 @@ function ChatPage() {
     }
   }
 
+  const handleFileSelect = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const newAttachments: FileAttachment[] = files.map((file) => ({
+      id: `${Date.now()}-${Math.random()}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file,
+    }))
+    setAttachments((prev) => [...prev, ...newAttachments])
+    // 清空 input 值，允许重复选择同一文件
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((att) => att.id !== id))
+  }
+
   return (
     <div className="chat-page">
       <div className="chat-messages">
@@ -75,6 +126,23 @@ function ChatPage() {
               className="message-avatar"
             />
             <div className="message-content">
+              {msg.attachments && msg.attachments.length > 0 && (
+                <div className="message-attachments">
+                  {msg.attachments.map((att) => (
+                    <div key={att.id} className="message-attachment">
+                      {att.type.startsWith('image/') ? (
+                        <img
+                          src={URL.createObjectURL(att.file)}
+                          alt={att.name}
+                          className="attachment-image"
+                        />
+                      ) : (
+                        <span className="attachment-file-name">{att.name}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="message-bubble">{msg.content}</div>
             </div>
           </div>
@@ -91,6 +159,19 @@ function ChatPage() {
       </div>
       <div className="chat-input-area">
         <div className="chat-input-wrapper">
+          <Tooltip title="上传文件（图片/文档）">
+            <button className="attach-btn" onClick={handleFileSelect}>
+              <PaperClipOutlined />
+            </button>
+          </Tooltip>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_TYPES}
+            multiple
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
           <Input.TextArea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -102,11 +183,23 @@ function ChatPage() {
           <button
             className="send-btn"
             onClick={handleSend}
-            disabled={!inputValue.trim() || loading}
+            disabled={(!inputValue.trim() && attachments.length === 0) || loading}
           >
             <SendOutlined />
           </button>
         </div>
+        {attachments.length > 0 && (
+          <div className="attachment-preview">
+            {attachments.map((att) => (
+              <div key={att.id} className="attachment-item">
+                <span className="attachment-name">{att.name}</span>
+                <span className="attachment-remove" onClick={() => removeAttachment(att.id)}>
+                  ×
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
